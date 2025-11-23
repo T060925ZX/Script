@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# 检查是否安装了 jq（JSON 解析工具）
+if ! command -v jq &> /dev/null; then
+    echo "jq 未安装，正在自动安装..."
+    if command -v apt &> /dev/null; then
+        sudo apt update && sudo apt install -y jq
+    elif command -v yum &> /dev/null; then
+        sudo yum install -y jq
+    else
+        echo "❌ 无法自动安装 jq，请手动安装后重试！"
+        exit 1
+    fi
+fi
+
+# 定义 Yunzai 的路径
+YUNZAI_DIR="/root/Yunzai"
+
+# 函数：检查 TRSS-Yunzai 状态
+check_status() {
+    status=$(pm2 jlist | jq -r '.[] | select(.name == "TRSS-Yunzai") | .pm2_env.status' 2>/dev/null)
+    if [[ "$status" == "online" ]]; then
+        echo "✅ TRSS-Yunzai 正在运行"
+        return 0
+    else
+        echo "❌ TRSS-Yunzai 未运行"
+        return 1
+    fi
+}
+
+# 函数：启动 TRSS-Yunzai
+start_yunzai() {
+    if check_status; then
+        echo "⚠️ TRSS-Yunzai 已经在运行中"
+    else
+        echo "🔧 启动 TRSS-Yunzai..."
+        cd "$YUNZAI_DIR" && pnpm start
+    fi
+}
+
+# 函数：停止 TRSS-Yunzai
+stop_yunzai() {
+    if check_status; then
+        echo "🛑 停止 TRSS-Yunzai..."
+        pm2 stop TRSS-Yunzai
+    else
+        echo "⚠️ TRSS-Yunzai 未在运行"
+    fi
+}
+
+# 函数：重启 TRSS-Yunzai
+restart_yunzai() {
+    echo "🔄 重启 TRSS-Yunzai..."
+    pm2 restart TRSS-Yunzai
+}
+
+# 函数：删除 TRSS-Yunzai 从 PM2
+delete_yunzai() {
+    echo "🗑️ 删除 TRSS-Yunzai 从 PM2..."
+    pm2 delete TRSS-Yunzai
+}
+
+# 函数：查看日志
+view_log() {
+    echo "🔍 查看 TRSS-Yunzai 日志..."
+    echo "按 Ctrl+C 退出日志查看"
+    tail -n 100 -f /root/.pm2/logs/TRSS-Yunzai-out.log
+}
+
+# 函数：显示帮助信息
+show_help() {
+    echo "使用方法: yz [命令]"
+    echo ""
+    echo "可用命令:"
+    echo "  start    - 启动 TRSS-Yunzai"
+    echo "  stop     - 停止 TRSS-Yunzai"
+    echo "  restart  - 重启 TRSS-Yunzai"
+    echo "  log      - 查看实时日志"
+    echo "  status   - 查看运行状态"
+    echo "  del      - 从 PM2 中删除 TRSS-Yunzai"
+    echo "  help     - 显示此帮助信息"
+}
+
+# 主程序
+case "$1" in
+    "start")
+        start_yunzai
+        ;;
+    "stop")
+        stop_yunzai
+        ;;
+    "restart")
+        restart_yunzai
+        ;;
+    "log")
+        view_log
+        ;;
+    "status")
+        check_status
+        ;;
+    "del")
+        delete_yunzai
+        ;;
+    "help"|"")
+        show_help
+        ;;
+    *)
+        echo "❌ 未知命令: $1"
+        echo "使用 'yz help' 查看可用命令"
+        exit 1
+        ;;
+esac
