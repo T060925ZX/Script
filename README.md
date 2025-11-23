@@ -1,4 +1,4 @@
-# Chromium
+# Script
 
 #### 介绍
 
@@ -7,12 +7,12 @@
 
 用下面的命令来安装
 ```
-bash <(curl https://raw.githubusercontent.com/T060925ZX/Chromium/refs/heads/main/chromium.sh)
+bash <(curl https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/Script.sh)
 ```
 
 国内网络问题可以使用以下镜像
 ```
-bash <(curl https://hubproxy.jiaozi.live/https://raw.githubusercontent.com/T060925ZX/Chromium/refs/heads/main/chromium.sh)
+bash <(curl https://hubproxy.jiaozi.live/https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/Script.sh)
 ```
 
 
@@ -22,11 +22,11 @@ bash <(curl https://hubproxy.jiaozi.live/https://raw.githubusercontent.com/T0609
 
 用下面的命令来安装
 ```
-bash <(curl https://raw.githubusercontent.com/T060925ZX/Chromium/refs/heads/main/nodejs.sh)
+bash <(curl https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/nodejs.sh)
 ```
 
 国内网络问题可以使用以下镜像
 ```
-bash <(curl https://hubproxy.jiaozi.live/https://raw.githubusercontent.com/T060925ZX/Chromium/refs/heads/main/nodejs.sh)
+bash <(curl https://hubproxy.jiaozi.live/https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/nodejs.sh)
 ```
 
