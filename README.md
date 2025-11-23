@@ -42,4 +42,6 @@ sudo wget "https://hubproxy.jiaozi.live/https://raw.githubusercontent.com/T06092
 ```
 
 安装完成后执行
+```
 sudo chmod +x /usr/local/bin/yz
+```
