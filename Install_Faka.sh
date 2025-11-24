@@ -166,7 +166,7 @@ deploy_project() {
     
     # 获取站点目录
     echo ""
-    read -p "请输入站点目录（例如：/www/wwwroot/pika.iloli.work）: " site_dir
+    read -p "请输入站点目录（例如：/www/wwwroot/shop.example.com）: " site_dir
     
     # 清理目录路径
     site_dir=$(echo "$site_dir" | sed 's:/*$::')
