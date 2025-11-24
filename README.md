@@ -52,8 +52,3 @@ sudo chmod +x /usr/local/bin/yz
 ```
 bash <(curl https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/Install_Faka.sh)
 ```
-
-国内网络问题可以使用以下镜像
-```
-bash <(curl https://hubproxy.jiaozi.live/https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/Install_Faka.sh)
-```
