@@ -160,6 +160,55 @@ select_version() {
     fi
 }
 
+# 创建伪静态配置文件
+create_rewrite_config() {
+    local site_dir="$1"
+    
+    # 从站点目录提取域名
+    # 假设目录格式为 /www/wwwroot/domain.com
+    domain=$(basename "$site_dir")
+    
+    # 验证域名格式
+    if [[ ! "$domain" =~ \. ]]; then
+        echo_warn "无法从目录名 '$domain' 提取有效域名，跳过伪静态配置"
+        return 1
+    fi
+    
+    # 宝塔伪静态目录
+    bt_rewrite_dir="/www/server/panel/vhost/rewrite"
+    rewrite_file="$bt_rewrite_dir/${domain}.conf"
+    
+    # 检查宝塔面板目录是否存在
+    if [ ! -d "$bt_rewrite_dir" ]; then
+        echo_warn "宝塔伪静态目录不存在: $bt_rewrite_dir"
+        echo_warn "请确保服务器安装了宝塔面板"
+        return 1
+    fi
+    
+    # 创建伪静态配置内容
+    rewrite_content='location / {
+      if (!-e $request_filename){
+              rewrite ^(.*)$ /index.php?s=$1 last; break;
+      }
+}'
+    
+    # 创建伪静态文件
+    echo "$rewrite_content" > "$rewrite_file"
+    
+    # 设置权限为644
+    chmod 644 "$rewrite_file"
+    
+    if [ $? -eq 0 ]; then
+        echo_info "伪静态配置文件创建成功: $rewrite_file"
+        echo_info "权限已设置为644"
+        echo_info "域名: $domain"
+        return 0
+    else
+        echo_error "伪静态配置文件创建失败"
+        return 1
+    fi
+}
+
 # 部署项目
 deploy_project() {
     local temp_dir="/tmp/acg-faka"
@@ -208,6 +257,11 @@ deploy_project() {
         echo_warn "权限设置可能不完整，请手动检查"
     fi
     
+    # 创建伪静态配置
+    echo ""
+    echo_info "正在创建伪静态配置文件..."
+    create_rewrite_config "$site_dir"
+    
     # 显示完成信息
     echo ""
     echo_info "=========================================="
@@ -216,6 +270,13 @@ deploy_project() {
     echo_info "Commit: $selected_commit"
     echo_info "部署目录: $site_dir"
     echo_info "=========================================="
+    
+    # 显示后续操作提示
+    echo ""
+    echo_warn "后续操作提示:"
+    echo_info "1. 请在宝塔面板中为站点 $domain 启用伪静态"
+    echo_info "2. 选择使用已有的伪静态配置文件"
+    echo_info "3. 或者手动在网站设置中应用伪静态规则"
 }
 
 # 主函数
