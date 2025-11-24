@@ -71,7 +71,7 @@ download_full_project() {
     if check_server_location; then
         echo_info "使用镜像下载完整项目..."
         # 修正镜像URL - 直接使用镜像代理的完整URL
-        git clone "https://github.com/lizhipay/acg-faka.git" "$temp_dir"
+        git clone "https://hubproxy.jiaozi.live/https://github.com/lizhipay/acg-faka.git" "$temp_dir"
     else
         echo_info "直接下载完整项目..."
         git clone "https://github.com/lizhipay/acg-faka.git" "$temp_dir"
@@ -104,7 +104,7 @@ select_version() {
     
     # 获取版本列表
     local count=0
-    echo_info "最近版本:"
+    # echo_info "最近版本:"
     git log --oneline -20 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | while read -r line; do
         commit_hash=$(echo "$line" | awk '{print $1}')
         message=$(echo "$line" | cut -d' ' -f2-)
@@ -130,7 +130,7 @@ select_version() {
     
     # 用户选择
     read -p "请输入要部署的版本号（例如：3.1.0）: " selected_version
-    read -p "请输入对应的Commit Hash: " selected_commit
+    read -p "请输入对应的Commit Hash（留空自动查找）: " selected_commit
     
     # 如果用户只输入了版本号，尝试自动查找commit
     if [ -n "$selected_version" ] && [ -z "$selected_commit" ]; then
