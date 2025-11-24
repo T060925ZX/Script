@@ -67,19 +67,25 @@ download_full_project() {
         rm -rf "$temp_dir"
     fi
     
-    # 下载项目
+    # 下载项目 - 修正镜像URL问题
     if check_server_location; then
         echo_info "使用镜像下载完整项目..."
-        # 修正镜像URL - 直接使用镜像代理的完整URL
-        git clone "https://github.com/lizhipay/acg-faka.git" "$temp_dir"
+        # 直接使用镜像站点的格式
+        git clone "https://hubproxy.jiaozi.live/github.com/lizhipay/acg-faka.git" "$temp_dir"
     else
         echo_info "直接下载完整项目..."
         git clone "https://github.com/lizhipay/acg-faka.git" "$temp_dir"
     fi
     
     if [ $? -ne 0 ] || [ ! -d "$temp_dir" ]; then
-        echo_error "项目下载失败"
-        exit 1
+        echo_error "项目下载失败，尝试直接使用GitHub..."
+        # 失败时直接使用GitHub
+        git clone "https://github.com/lizhipay/acg-faka.git" "$temp_dir"
+        
+        if [ $? -ne 0 ]; then
+            echo_error "所有下载方式都失败，请检查网络连接"
+            exit 1
+        fi
     fi
     
     echo_info "项目下载完成"
@@ -103,7 +109,6 @@ select_version() {
     echo "=========================================="
     
     # 获取版本列表
-    local count=0
     echo_info "最近版本:"
     git log --oneline -20 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | while read -r line; do
         commit_hash=$(echo "$line" | awk '{print $1}')
@@ -111,26 +116,15 @@ select_version() {
         version=$(echo "$message" | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | head -1)
         if [ -n "$version" ]; then
             printf "%-10s %-40s %s\n" "$version" "$commit_hash" "$message"
-            ((count++))
         fi
     done
-    
-    # 如果没有找到版本，显示所有commit
-    if [ $count -eq 0 ]; then
-        echo_info "所有commit:"
-        git log --oneline -20 | head -10 | while read -r line; do
-            commit_hash=$(echo "$line" | awk '{print $1}')
-            message=$(echo "$line" | cut -d' ' -f2-)
-            printf "%-10s %-40s %s\n" "latest" "$commit_hash" "$message"
-        done
-    fi
     
     echo "=========================================="
     echo ""
     
     # 用户选择
     read -p "请输入要部署的版本号（例如：3.1.0）: " selected_version
-    read -p "请输入对应的Commit Hash（留空自动查找）: " selected_commit
+    read -p "请输入对应的Commit Hash: " selected_commit
     
     # 如果用户只输入了版本号，尝试自动查找commit
     if [ -n "$selected_version" ] && [ -z "$selected_commit" ]; then
