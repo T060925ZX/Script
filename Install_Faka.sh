@@ -124,7 +124,7 @@ select_version() {
     
     # 用户选择
     read -p "请输入要部署的版本号（例如：3.1.0）: " selected_version
-    read -p "请输入对应的Commit Hash: " selected_commit
+    read -p "请输入对应的Commit Hash（留空自动查找）: " selected_commit
     
     # 如果用户只输入了版本号，尝试自动查找commit
     if [ -n "$selected_version" ] && [ -z "$selected_commit" ]; then
