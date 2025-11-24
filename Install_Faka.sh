@@ -67,17 +67,14 @@ download_full_project() {
         rm -rf "$temp_dir"
     fi
     
-    # 设置URL
-    local mirror_url="https://hubproxy.jiaozi.live/"
-    local repo_url="https://github.com/lizhipay/acg-faka.git"
-    
     # 下载项目
     if check_server_location; then
         echo_info "使用镜像下载完整项目..."
-        git clone "${mirror_url}${repo_url}" "$temp_dir"
+        # 修正镜像URL - 直接使用镜像代理的完整URL
+        git clone "https://hubproxy.jiaozi.live/https://github.com/lizhipay/acg-faka.git" "$temp_dir"
     else
         echo_info "直接下载完整项目..."
-        git clone "$repo_url" "$temp_dir"
+        git clone "https://github.com/lizhipay/acg-faka.git" "$temp_dir"
     fi
     
     if [ $? -ne 0 ] || [ ! -d "$temp_dir" ]; then
@@ -105,33 +102,26 @@ select_version() {
     echo "           可用的版本列表"
     echo "=========================================="
     
-    # 获取版本列表，显示最近的20个版本
+    # 获取版本列表
     local count=0
-    local versions=()
-    
-    while IFS= read -r line; do
-        if [[ $line =~ ^commit\ ([a-f0-9]+) ]] && [[ $commit_msg =~ ([0-9]+\.[0-9]+\.[0-9]+) ]]; then
-            commit_hash="${BASH_REMATCH[1]}"
-            version="${BASH_REMATCH[1]}"
-            versions+=("$commit_hash:$version")
-            printf "%-10s %-40s %s\n" "$version" "$commit_hash" "$(echo "$commit_msg" | sed 's/^ *//')"
+    echo_info "最近版本:"
+    git log --oneline -20 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | while read -r line; do
+        commit_hash=$(echo "$line" | awk '{print $1}')
+        message=$(echo "$line" | cut -d' ' -f2-)
+        version=$(echo "$message" | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | head -1)
+        if [ -n "$version" ]; then
+            printf "%-10s %-40s %s\n" "$version" "$commit_hash" "$message"
             ((count++))
-            if [ $count -ge 20 ]; then
-                break
-            fi
         fi
-        commit_msg="$line"
-    done < <(git log --oneline -50)
+    done
     
-    # 如果上面的方法没找到，使用更简单的方法
+    # 如果没有找到版本，显示所有commit
     if [ $count -eq 0 ]; then
-        echo_info "使用备选方法获取版本..."
-        git log --oneline -20 | while read -r commit_hash message; do
-            if [[ $message =~ ([0-9]+\.[0-9]+\.[0-9]+) ]]; then
-                version="${BASH_REMATCH[1]}"
-                versions+=("$commit_hash:$version")
-                printf "%-10s %-40s %s\n" "$version" "$commit_hash" "$message"
-            fi
+        echo_info "所有commit:"
+        git log --oneline -20 | head -10 | while read -r line; do
+            commit_hash=$(echo "$line" | awk '{print $1}')
+            message=$(echo "$line" | cut -d' ' -f2-)
+            printf "%-10s %-40s %s\n" "latest" "$commit_hash" "$message"
         done
     fi
     
@@ -140,7 +130,7 @@ select_version() {
     
     # 用户选择
     read -p "请输入要部署的版本号（例如：3.1.0）: " selected_version
-    read -p "请输入对应的Commit Hash（放空自动查找）: " selected_commit
+    read -p "请输入对应的Commit Hash: " selected_commit
     
     # 如果用户只输入了版本号，尝试自动查找commit
     if [ -n "$selected_version" ] && [ -z "$selected_commit" ]; then
@@ -182,7 +172,7 @@ deploy_project() {
     
     # 获取站点目录
     echo ""
-    read -p "请输入站点目录（例如：/www/wwwroot/shop.example.com）: " site_dir
+    read -p "请输入站点目录（例如：/www/wwwroot/pika.iloli.work）: " site_dir
     
     # 清理目录路径
     site_dir=$(echo "$site_dir" | sed 's:/*$::')
