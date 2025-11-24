@@ -71,7 +71,7 @@ download_full_project() {
     if check_server_location; then
         echo_info "使用镜像下载完整项目..."
         # 修正镜像URL - 直接使用镜像代理的完整URL
-        git clone "https://hubproxy.jiaozi.live/https://github.com/lizhipay/acg-faka.git" "$temp_dir"
+        git clone "https://github.com/lizhipay/acg-faka.git" "$temp_dir"
     else
         echo_info "直接下载完整项目..."
         git clone "https://github.com/lizhipay/acg-faka.git" "$temp_dir"
