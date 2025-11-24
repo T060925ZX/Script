@@ -104,7 +104,7 @@ select_version() {
     
     # 获取版本列表
     local count=0
-    # echo_info "最近版本:"
+    echo_info "最近版本:"
     git log --oneline -20 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | while read -r line; do
         commit_hash=$(echo "$line" | awk '{print $1}')
         message=$(echo "$line" | cut -d' ' -f2-)
