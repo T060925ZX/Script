@@ -7,12 +7,12 @@
 
 用下面的命令来安装
 ```
-bash <(curl https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/chromium)
+bash <(curl https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/chromium.sh)
 ```
 
 国内网络问题可以使用以下镜像
 ```
-bash <(curl https://hubproxy.jiaozi.live/https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/chromium)
+bash <(curl https://hubproxy.jiaozi.live/https://raw.githubusercontent.com/T060925ZX/Script/refs/heads/main/chromium.sh)
 ```
 
 ## Ubuntu安装Node.js
