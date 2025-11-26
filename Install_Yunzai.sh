@@ -82,7 +82,7 @@ detect_os() {
 run_china_specific_script() {
     if check_ip_in_china && detect_os; then
         log_info "执行国内优化脚本..."
-        bash <(curl -sSL https://linuxmirrors.cn/main.sh)
+        // bash <(curl -sSL https://linuxmirrors.cn/main.sh)
     fi
 }
 
